@@ -1,9 +1,9 @@
-# 2022/04/09 v1.0 developed by Seok Ho Lee
+# 2022/04/09 v1.1 developed by Seok Ho Lee
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from pytube import YouTube
-import os,sys,glob,webbrowser
+import os,sys,glob,webbrowser,ffmpeg
 class MainClass(QMainWindow):
     def check(self,status,num):
         exec('Name'+num+'.setDisabled('+str(not status)+')')
@@ -16,7 +16,7 @@ class MainClass(QMainWindow):
             info=QMessageBox()
             info.setWindowTitle('정보')
             info.setIcon(QMessageBox.Information)
-            info.setText('v1.0 developed by Seok Ho Lee')
+            info.setText('v1.1 developed by Seok Ho Lee')
             info.setStandardButtons(QMessageBox.Yes|QMessageBox.Close)
             info.button(QMessageBox.Yes).setText('Github')
             info.exec_()
@@ -28,8 +28,9 @@ class MainClass(QMainWindow):
                 YouTube(FLink).streams.filter(only_audio=True).first().download()
                 for x in glob.glob('*.mp4'):
                     if not os.path.isdir(x):
-                        exec('global FName; FName=Name'+num+'.text()')
-                        os.rename(x,FName+'.mp3')
+                        exec('global FName; FName=Name'+num+'.text()+\'.mp3\'')
+                        ffmpeg.input(x).output(FName).run(overwrite_output=True)
+                        os.remove(x)
             else: return
         def warning(num):
             exec('global temp; temp=Check'+num+'.isChecked()')
